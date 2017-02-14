@@ -99,7 +99,6 @@ set_property(SOURCE ${${PROJECT_NAME}_ASMSources} PROPERTY LANGUAGE C)
 include_directories(${PROJ_PATH})
 
 add_executable(${PROJECT_NAME}.elf ${${PROJECT_NAME}_Sources})
-MESSAGE(STATUS ${${PROJECT_NAME}_Sources})
 
 # add custom command for converting .elf to .hex
 # .hex file is the one which for uploading
@@ -120,13 +119,13 @@ endif(BUILD_AND_UPLOAD)
 # list of files that will be cleaned as a part of "make clean" stage
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_NAME}.hex ${PROJECT_NAME}.map)
 
-file ( WRITE ${CMAKE_BINARY_DIR}/clean-all.cmake
-    "# clean-all.cmake\n"
+file ( WRITE ${CMAKE_BINARY_DIR}/clean-cmake-files.cmake
+    "# clean-cmake-files.cmake\n"
     "set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt\n"
     "                    ${CMAKE_BINARY_DIR}/cmake_install.cmake\n"
     "                    ${CMAKE_BINARY_DIR}/Makefile\n"
     "                    ${CMAKE_BINARY_DIR}/CMakeFiles\n"
-    "                    ${CMAKE_BINARY_DIR}/clean-all.cmake\n"
+    "                    ${CMAKE_BINARY_DIR}/clean-cmake-files.cmake\n"
     ")\n"
     "\n"
     "foreach(file \${cmake_generated})\n"
@@ -136,11 +135,11 @@ file ( WRITE ${CMAKE_BINARY_DIR}/clean-all.cmake
     "endforeach(file)\n" )
 
 add_custom_target(clean-cmake-files
-   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/clean-all.cmake
+   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/clean-cmake-files.cmake
 )
 
 add_custom_target(clean-all
    COMMAND ${CMAKE_BUILD_TOOL} clean
-   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/clean-all.cmake
+   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/clean-cmake-files.cmake
 )
 #################################################################
