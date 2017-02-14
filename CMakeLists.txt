@@ -115,3 +115,32 @@ if(BUILD_AND_UPLOAD)
     add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD COMMAND lm4flash ARGS ${PROJECT_NAME}.hex)
 endif(BUILD_AND_UPLOAD)
 #################################################################
+
+######################### clear config ##########################
+# list of files that will be cleaned as a part of "make clean" stage
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_NAME}.hex ${PROJECT_NAME}.map)
+
+file ( WRITE ${CMAKE_BINARY_DIR}/clean-all.cmake
+    "# clean-all.cmake\n"
+    "set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt\n"
+    "                    ${CMAKE_BINARY_DIR}/cmake_install.cmake\n"
+    "                    ${CMAKE_BINARY_DIR}/Makefile\n"
+    "                    ${CMAKE_BINARY_DIR}/CMakeFiles\n"
+    "                    ${CMAKE_BINARY_DIR}/clean-all.cmake\n"
+    ")\n"
+    "\n"
+    "foreach(file \${cmake_generated})\n"
+    "    if (EXISTS \${file})\n"
+    "        file(REMOVE_RECURSE \${file})\n"
+    "    endif()\n"
+    "endforeach(file)\n" )
+
+add_custom_target(clean-cmake-files
+   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/clean-all.cmake
+)
+
+add_custom_target(clean-all
+   COMMAND ${CMAKE_BUILD_TOOL} clean
+   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/clean-all.cmake
+)
+#################################################################
