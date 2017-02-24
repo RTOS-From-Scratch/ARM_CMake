@@ -55,15 +55,17 @@ SET(CMAKE_ASM_COMPILER ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-as CACHE STRING "
 #################################################################
 
 ################# check important files existance################
-# check `tm4c123gh6pm.lds` existance
-if( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
-	MESSAGE(FATAL_ERROR "Can't find `tm4c123gh6pm.lds` linker file in ${PROJ_PATH}.")
-endif(NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
+if(RFS_TESTING)
+	# check `tm4c123gh6pm.lds` existance
+	if( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
+		MESSAGE(FATAL_ERROR "Can't find `tm4c123gh6pm.lds` linker file in ${PROJ_PATH}.")
+	endif(NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
 
-# check `startup.c` existance
-if( NOT EXISTS ${PROJ_PATH}/startup.c )
-	MESSAGE(FATAL_ERROR "Can't find `startup.c` file in ${PROJ_PATH}.")
-endif( NOT EXISTS ${PROJ_PATH}/startup.c )
+	# check `startup.c` existance
+	if( NOT EXISTS ${PROJ_PATH}/startup.c )
+		MESSAGE(FATAL_ERROR "Can't find `startup.c` file in ${PROJ_PATH}.")
+	endif( NOT EXISTS ${PROJ_PATH}/startup.c )
+endif(RFS_TESTING)
 
 # check `tm4c123gh6pm.h` existance
 if( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
@@ -76,11 +78,18 @@ endif( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
 FILE(GLOB ${PROJECT_NAME}_CSources ${CMAKE_SOURCE_DIR}/*.c)
 FILE(GLOB ${PROJECT_NAME}_CppSources ${CMAKE_SOURCE_DIR}/*.cpp)
 FILE(GLOB ${PROJECT_NAME}_ASMSources ${CMAKE_SOURCE_DIR}/*.s ${CMAKE_SOURCE_DIR}/*.S)
-FILE(GLOB ${PROJECT_NAME}_Headers ${CMAKE_SOURCE_DIR}/*.h)
-SET ( Other_${PROJECT_NAME}_Sources ${PROJ_PATH}/startup.c ${PROJ_PATH}/tm4c123gh6pm.h )
-SET (${PROJECT_NAME}_Sources ${${PROJECT_NAME}_CSources} ${${PROJECT_NAME}_CppSources} ${${PROJECT_NAME}_ASMSources} ${${PROJECT_NAME}_Headers} ${Other_${PROJECT_NAME}_Sources})
-# FILE(GLOB ${PROJECT_NAME}_Sources ${CMAKE_SOURCE_DIR}/*)
-# SET (${PROJECT_NAME}_Sources ${${PROJECT_NAME}_Sources} ${Other_${PROJECT_NAME}_Sources})
+SET ( Other_${PROJECT_NAME}_Sources ${PROJ_PATH}/tm4c123gh6pm.h )
+# if in testing mode, add `main.c` and `startup.c`
+if(RFS_TESTING)
+	SET( ${PROJECT_NAME}_main ${PROJ_PATH}/main.c )
+	SET( Other_${PROJECT_NAME}_Sources ${Other_${PROJECT_NAME}_Sources} ${PROJ_PATH}/startup.c )
+endif(RFS_TESTING)
+SET (${PROJECT_NAME}_Sources ${${PROJECT_NAME}_CSources}
+							 ${${PROJECT_NAME}_CppSources}
+							 ${${PROJECT_NAME}_ASMSources}
+							 ${${PROJECT_NAME}_Headers}
+							 ${Other_${PROJECT_NAME}_Sources}
+							 ${${PROJECT_NAME}_main})
 #################################################################
 
 ################## Compiler and linker configs ##################
@@ -98,13 +107,19 @@ set_property(SOURCE ${${PROJECT_NAME}_ASMSources} PROPERTY LANGUAGE C)
 # include tm4c123gh6pm.h startup.c files
 include_directories(${PROJ_PATH})
 
-add_executable(${PROJECT_NAME}.elf ${${PROJECT_NAME}_Sources})
+if(RFS_TESTING)
+	add_executable(${PROJECT_NAME}.elf ${${PROJECT_NAME}_Sources})
 
-# add custom command for converting .elf to .hex
-# .hex file is the one which for uploading
-# .elf file is the one which used for debugging
-add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD COMMAND ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-objcopy ARGS -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex)
-add_custom_target(upload lm4flash ${PROJECT_NAME}.hex DEPENDS ${PROJECT_NAME}.elf )
+	# add custom command for converting .elf to .hex
+	# .hex file is the one which for uploading
+	# .elf file is the one which used for debugging
+	add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD COMMAND ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-objcopy ARGS -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex)
+	add_custom_target(upload lm4flash ${PROJECT_NAME}.hex DEPENDS ${PROJECT_NAME}.elf)
+# else, this build without linking
+else(RFS_TESTING)
+	add_library(${PROJECT_NAME} OBJECT ${${PROJECT_NAME}_Sources})
+endif(RFS_TESTING)
+#################################################################
 
 # option for build and then upload
 SET(BUILD_AND_UPLOAD False CACHE BOOL "Build then upload")
@@ -113,6 +128,14 @@ if(BUILD_AND_UPLOAD)
     message(STATUS "Uploading...")
     add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD COMMAND lm4flash ARGS ${PROJECT_NAME}.hex)
 endif(BUILD_AND_UPLOAD)
+
+# option for `testing parts of RFS`
+SET(RFS_TESTING False CACHE BOOL "Turn on RFS testing - include main.c")
+if(RFS_TESTING)
+	message(STATUS "-------------------------")
+    message(STATUS "| RFS Testing is ON ... |")
+    message(STATUS "-------------------------")
+endif(RFS_TESTING)
 #################################################################
 
 ######################### clear config ##########################
