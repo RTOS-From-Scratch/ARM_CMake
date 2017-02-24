@@ -74,12 +74,17 @@ endif( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
 #################################################################
 
 ######################## My Sources files #######################
-# TODO: better way to find files types
+# `lib` path
 SET( CMAKE_LIBRARY_PATH ${PROJ_PATH}/lib )
+# `C` sources path
 FILE(GLOB ${PROJECT_NAME}_CSources ${CMAKE_SOURCE_DIR}/*.c)
+# `CPP` sources path
 FILE(GLOB ${PROJECT_NAME}_CppSources ${CMAKE_SOURCE_DIR}/*.cpp)
+# `ASM` sources path
 FILE(GLOB ${PROJECT_NAME}_ASMSources ${CMAKE_SOURCE_DIR}/*.s ${CMAKE_SOURCE_DIR}/*.S)
+# `h` headers path
 FILE(GLOB ${PROJECT_NAME}_Headers ${CMAKE_SOURCE_DIR}/*.h ${CMAKE_LIBRARY_PATH}/*.h)
+# other sources
 SET ( Other_${PROJECT_NAME}_Sources ${PROJ_PATH}/tm4c123gh6pm.h )
 # if in testing mode, add `main.c` and `startup.c`
 if(RFS_TESTING)
@@ -105,6 +110,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-Wl,-Map,'${PROJECT_NAME}.map' -Wl,-T'${PROJ_PATH}/t
 
 ######################## Project configs ########################
 project(${PROJECT_NAME} C CXX)
+# treat `assembly` files as `C` files
 set_property(SOURCE ${${PROJECT_NAME}_ASMSources} PROPERTY LANGUAGE C)
 
 # include tm4c123gh6pm.h startup.c files
