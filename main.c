@@ -19,7 +19,7 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "led.h"
+#include "src/led.h"
 #include "tm4c123gh6pm.h"
 
 int main()
