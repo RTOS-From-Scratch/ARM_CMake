@@ -1,27 +1,27 @@
 #/*
 # * Description : CMake is an open-source, cross-platform family of tools
 # *               designed to build, test and package software.
-# * Usage	    : CMake is used to control the software compilation process
+# * Usage       : CMake is used to control the software compilation process
 # *               using simple platform and compiler independent 
 # *               configuration files, and generate native makefiles
 # *               and workspaces that can be used in the compiler environment
 # *               of your choice.
-# * Author	    : Baron Leonardo <mohamedayman.fcis@zoho.com>
-# * License	    : Copyright (C) 2016 RTOS From Scratch
+# * Author      : Baron Leonardo <mohamedayman.fcis@zoho.com>
+# * License     : Copyright (C) 2016 RTOS From Scratch
 # *
 # *
-# *	This program is free software: you can redistribute it and/or modify
-# *	it under the terms of the GNU General Public License as published by
-# *	the Free Software Foundation, either version 3 of the License, or
-# *	(at your option) any later version.
+# * This program is free software: you can redistribute it and/or modify
+# * it under the terms of the GNU General Public License as published by
+# * the Free Software Foundation, either version 3 of the License, or
+# * (at your option) any later version.
 # *
-# *	This program is distributed in the hope that it will be useful,
-# *	but WITHOUT ANY WARRANTY; without even the implied warranty of
-# *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# *	GNU General Public License for more details.
+# * This program is distributed in the hope that it will be useful,
+# * but WITHOUT ANY WARRANTY; without even the implied warranty of
+# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# * GNU General Public License for more details.
 # *
-# *	You should have received a copy of the GNU General Public License
-# *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# * You should have received a copy of the GNU General Public License
+# * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # */
 
 cmake_minimum_required(VERSION 3.2)
@@ -125,7 +125,7 @@ if(RFS_TESTING)
 	# .hex file is the one which for uploading
 	# .elf file is the one which used for debugging
 	add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD COMMAND ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-objcopy ARGS -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex)
-	add_custom_target(upload lm4flash ${PROJECT_NAME}.hex DEPENDS ${PROJECT_NAME}.elf)
+	add_custom_target(upload lm4flash ${PROJECT_NAME}.hex DEPENDS ${PROJECT_NAME}.elf COMMENT "Uploading ...")
 # else, this build without linking
 else(RFS_TESTING)
 	add_library(${PROJECT_NAME} OBJECT ${${PROJECT_NAME}_Sources})
