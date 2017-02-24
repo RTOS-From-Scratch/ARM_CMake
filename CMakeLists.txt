@@ -75,14 +75,17 @@ endif( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
 
 ######################## My Sources files #######################
 # TODO: better way to find files types
+SET( CMAKE_LIBRARY_PATH ${PROJ_PATH}/lib )
 FILE(GLOB ${PROJECT_NAME}_CSources ${CMAKE_SOURCE_DIR}/*.c)
 FILE(GLOB ${PROJECT_NAME}_CppSources ${CMAKE_SOURCE_DIR}/*.cpp)
 FILE(GLOB ${PROJECT_NAME}_ASMSources ${CMAKE_SOURCE_DIR}/*.s ${CMAKE_SOURCE_DIR}/*.S)
+FILE(GLOB ${PROJECT_NAME}_Headers ${CMAKE_SOURCE_DIR}/*.h ${CMAKE_LIBRARY_PATH}/*.h)
 SET ( Other_${PROJECT_NAME}_Sources ${PROJ_PATH}/tm4c123gh6pm.h )
 # if in testing mode, add `main.c` and `startup.c`
 if(RFS_TESTING)
 	SET( ${PROJECT_NAME}_main ${PROJ_PATH}/main.c )
 	SET( Other_${PROJECT_NAME}_Sources ${Other_${PROJECT_NAME}_Sources} ${PROJ_PATH}/startup.c )
+	FILE(GLOB ${PROJECT_NAME}_LIBS ${CMAKE_LIBRARY_PATH}/*.a )
 endif(RFS_TESTING)
 SET (${PROJECT_NAME}_Sources ${${PROJECT_NAME}_CSources}
 							 ${${PROJECT_NAME}_CppSources}
@@ -109,6 +112,8 @@ include_directories(${PROJ_PATH})
 
 if(RFS_TESTING)
 	add_executable(${PROJECT_NAME}.elf ${${PROJECT_NAME}_Sources})
+	# link the output with the libraries in `lib` folder
+	target_link_libraries(${PROJECT_NAME}.elf ${${PROJECT_NAME}_LIBS})
 
 	# add custom command for converting .elf to .hex
 	# .hex file is the one which for uploading
