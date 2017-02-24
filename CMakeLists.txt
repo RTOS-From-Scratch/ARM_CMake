@@ -132,13 +132,13 @@ else(RFS_TESTING)
 endif(RFS_TESTING)
 #################################################################
 
+######################### CMake options #########################
 # option for build and then upload
-SET(BUILD_AND_UPLOAD False CACHE BOOL "Build then upload")
-
-if(BUILD_AND_UPLOAD)
+SET(RFS_BUILD_AND_UPLOAD False CACHE BOOL "Build then upload")
+if(RFS_BUILD_AND_UPLOAD)
     message(STATUS "Uploading...")
     add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD COMMAND lm4flash ARGS ${PROJECT_NAME}.hex)
-endif(BUILD_AND_UPLOAD)
+endif(RFS_BUILD_AND_UPLOAD)
 
 # option for `testing parts of RFS`
 SET(RFS_TESTING False CACHE BOOL "Turn on RFS testing - include main.c")
