@@ -77,20 +77,20 @@ endif( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
 # `lib` path
 SET( CMAKE_LIBRARY_PATH ${PROJ_PATH}/lib )
 # `C` sources path
-FILE(GLOB ${PROJECT_NAME}_CSources ${CMAKE_SOURCE_DIR}/*.c)
+FILE(GLOB_RECURSE ${PROJECT_NAME}_CSources ${CMAKE_SOURCE_DIR}/*.c)
 # `CPP` sources path
-FILE(GLOB ${PROJECT_NAME}_CppSources ${CMAKE_SOURCE_DIR}/*.cpp)
+FILE(GLOB_RECURSE ${PROJECT_NAME}_CppSources ${CMAKE_SOURCE_DIR}/*.cpp)
 # `ASM` sources path
-FILE(GLOB ${PROJECT_NAME}_ASMSources ${CMAKE_SOURCE_DIR}/*.s ${CMAKE_SOURCE_DIR}/*.S)
+FILE(GLOB_RECURSE ${PROJECT_NAME}_ASMSources ${CMAKE_SOURCE_DIR}/*.s ${CMAKE_SOURCE_DIR}/*.S)
 # `h` headers path
-FILE(GLOB ${PROJECT_NAME}_Headers ${CMAKE_SOURCE_DIR}/*.h ${CMAKE_LIBRARY_PATH}/*.h)
+FILE(GLOB_RECURSE ${PROJECT_NAME}_Headers ${CMAKE_SOURCE_DIR}/*.h ${CMAKE_LIBRARY_PATH}/*.h)
 # other sources
 SET ( Other_${PROJECT_NAME}_Sources ${PROJ_PATH}/tm4c123gh6pm.h )
 # if in testing mode, add `main.c` and `startup.c`
 if(RFS_TESTING)
 	SET( ${PROJECT_NAME}_main ${PROJ_PATH}/main.c )
 	SET( Other_${PROJECT_NAME}_Sources ${Other_${PROJECT_NAME}_Sources} ${PROJ_PATH}/startup.c )
-	FILE(GLOB ${PROJECT_NAME}_LIBS ${CMAKE_LIBRARY_PATH}/*.a )
+	FILE(GLOB_RECURSE ${PROJECT_NAME}_LIBS ${CMAKE_LIBRARY_PATH}/*.a )
 endif(RFS_TESTING)
 SET (${PROJECT_NAME}_Sources ${${PROJECT_NAME}_CSources}
 							 ${${PROJECT_NAME}_CppSources}
