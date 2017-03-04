@@ -54,7 +54,7 @@ SET(CMAKE_CXX_COMPILER ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-g++ CACHE STRING 
 SET(CMAKE_ASM_COMPILER ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-as CACHE STRING "ASM" FORCE)
 #################################################################
 
-################# check important files existance################
+################# check important files existance ################
 if(RFS_TESTING)
 	# check `tm4c123gh6pm.lds` existance
 	if( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
@@ -72,6 +72,10 @@ if( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
 	MESSAGE(FATAL_ERROR "Can't find `tm4c123gh6pm.h` file in ${PROJ_PATH}.")
 endif( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
 #################################################################
+
+############################# Network ############################
+# connect other parts to this part from RFS
+##################################################################
 
 ######################## My Sources files #######################
 # `lib` path
