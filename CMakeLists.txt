@@ -56,20 +56,20 @@ SET(CMAKE_ASM_COMPILER ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-as CACHE STRING "
 
 ################# check important files existance ################
 if(RFS_TESTING)
-	# check `tm4c123gh6pm.lds` existance
-	if( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
-		MESSAGE(FATAL_ERROR "Can't find `tm4c123gh6pm.lds` linker file in ${PROJ_PATH}.")
-	endif(NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
+    # check `tm4c123gh6pm.lds` existance
+    if( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
+        MESSAGE(FATAL_ERROR "Can't find `tm4c123gh6pm.lds` linker file in ${PROJ_PATH}.")
+    endif(NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.lds)
 
-	# check `startup.c` existance
-	if( NOT EXISTS ${PROJ_PATH}/startup.c )
-		MESSAGE(FATAL_ERROR "Can't find `startup.c` file in ${PROJ_PATH}.")
-	endif( NOT EXISTS ${PROJ_PATH}/startup.c )
+    # check `startup.c` existance
+    if( NOT EXISTS ${PROJ_PATH}/startup.c )
+        MESSAGE(FATAL_ERROR "Can't find `startup.c` file in ${PROJ_PATH}.")
+    endif( NOT EXISTS ${PROJ_PATH}/startup.c )
 endif(RFS_TESTING)
 
 # check `tm4c123gh6pm.h` existance
 if( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
-	MESSAGE(FATAL_ERROR "Can't find `tm4c123gh6pm.h` file in ${PROJ_PATH}.")
+    MESSAGE(FATAL_ERROR "Can't find `tm4c123gh6pm.h` file in ${PROJ_PATH}.")
 endif( NOT EXISTS ${PROJ_PATH}/tm4c123gh6pm.h )
 #################################################################
 
@@ -95,9 +95,9 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_Headers ${CMAKE_SOURCE_DIR}/*.h ${CMAKE_LIBRAR
 SET ( Other_${PROJECT_NAME}_Sources ${PROJ_PATH}/tm4c123gh6pm.h )
 # if in testing mode, add `main.c` and `startup.c`
 if(RFS_TESTING)
-	SET( ${PROJECT_NAME}_main ${PROJ_PATH}/main.c )
-	SET( Other_${PROJECT_NAME}_Sources ${Other_${PROJECT_NAME}_Sources} ${PROJ_PATH}/startup.c )
-	FILE(GLOB_RECURSE ${PROJECT_NAME}_LIBS ${CMAKE_LIBRARY_PATH}/*.a )
+    SET( ${PROJECT_NAME}_main ${PROJ_PATH}/main.c )
+    SET( Other_${PROJECT_NAME}_Sources ${Other_${PROJECT_NAME}_Sources} ${PROJ_PATH}/startup.c )
+    FILE(GLOB_RECURSE ${PROJECT_NAME}_LIBS ${CMAKE_LIBRARY_PATH}/*.a )
 endif(RFS_TESTING)
 SET (${PROJECT_NAME}_Sources ${${PROJECT_NAME}_CSources}
                              ${${PROJECT_NAME}_CppSources}
@@ -122,21 +122,25 @@ project(${PROJECT_NAME} C CXX)
 set_property(SOURCE ${${PROJECT_NAME}_ASMSources} PROPERTY LANGUAGE C)
 
 # include tm4c123gh6pm.h startup.c files
-include_directories(${PROJ_PATH})
+## include the outer level `..` that contains the other parts 
+## of the RFS ( Drivers, Kernel, ... ) to facilitate the including of the headers
+## ex. -> #include "../../DataStructures/src/queue.h"
+## into #include "DataStructures/src/queue.h"
+include_directories(${PROJ_PATH} ..)
 
 if(RFS_TESTING)
-	add_executable(${PROJECT_NAME}.elf ${${PROJECT_NAME}_Sources})
-	# link the output with the libraries in `lib` folder
-	target_link_libraries(${PROJECT_NAME}.elf ${${PROJECT_NAME}_LIBS})
+    add_executable(${PROJECT_NAME}.elf ${${PROJECT_NAME}_Sources})
+    # link the output with the libraries in `lib` folder
+    target_link_libraries(${PROJECT_NAME}.elf ${${PROJECT_NAME}_LIBS})
 
-	# add custom command for converting .elf to .hex
-	# .hex file is the one which for uploading
-	# .elf file is the one which used for debugging
-	add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD COMMAND ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-objcopy ARGS -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex)
-	add_custom_target(upload lm4flash ${PROJECT_NAME}.hex DEPENDS ${PROJECT_NAME}.elf COMMENT "Uploading ...")
+    # add custom command for converting .elf to .hex
+    # .hex file is the one which for uploading
+    # .elf file is the one which used for debugging
+    add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD COMMAND ${ARM_TOOLCHAIN_BIN_PATH}/arm-none-eabi-objcopy ARGS -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex)
+    add_custom_target(upload lm4flash ${PROJECT_NAME}.hex DEPENDS ${PROJECT_NAME}.elf COMMENT "Uploading ...")
 # else, this build without linking
 else(RFS_TESTING)
-	add_library(${PROJECT_NAME} OBJECT ${${PROJECT_NAME}_Sources})
+    add_library(${PROJECT_NAME} OBJECT ${${PROJECT_NAME}_Sources})
 endif(RFS_TESTING)
 #################################################################
 
@@ -151,7 +155,7 @@ endif(RFS_BUILD_AND_UPLOAD)
 # option for `testing parts of RFS`
 SET(RFS_TESTING False CACHE BOOL "Turn on RFS testing - include main.c")
 if(RFS_TESTING)
-	message(STATUS "-------------------------")
+    message(STATUS "-------------------------")
     message(STATUS "| RFS Testing is ON ... |")
     message(STATUS "-------------------------")
 endif(RFS_TESTING)
